@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { AiFillFilePdf, AiFillFile } from "react-icons/ai";
 
 import styles from "./DragDropBox.module.css";
+import Buttons from "./Buttons";
 
 const DragDropBox = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -48,6 +49,10 @@ const DragDropBox = () => {
       inputRef.current.click();
     }
   };
+
+  // useEffect(() => {
+  //   console.log(files);
+  // }, [files]);
 
   return (
     <form
@@ -105,6 +110,7 @@ const DragDropBox = () => {
           );
         })}
       </div>
+      <Buttons {...files} />
     </form>
   );
 };
