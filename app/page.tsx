@@ -1,8 +1,8 @@
+import { useState } from "react";
+
 import styles from "./page.module.css";
 
 import DragDropBox from "./components/DragDropBox";
-import Buttons from "./components/Buttons";
-import { saveFiles } from "./requests";
 
 export default function Home() {
   return (

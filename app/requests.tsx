@@ -6,16 +6,21 @@ export const saveFiles = async (files: File[]) => {
   Object.values(files).forEach((file, index) =>
     formData.append("files", file, file.name)
   );
+  try {
+    const response = await axios.post(
+      "https://localhost:7014/api/FileModel",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
 
-  const response = await axios.post(
-    "https://localhost:7014/api/FileModel",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
 
-        "Access-Control-Allow-Origin": "*",
-      },
-    }
-  );
+    return response;
+  } catch (err) {
+    console.log(err);
+  }
 };

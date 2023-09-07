@@ -50,10 +50,6 @@ const DragDropBox = () => {
     }
   };
 
-  // useEffect(() => {
-  //   console.log(files);
-  // }, [files]);
-
   return (
     <form
       id="form-file-upload"
