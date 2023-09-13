@@ -1,3 +1,6 @@
+import { Dispatch, SetStateAction } from "react";
+
+///state types
 export type ErrorResult = {
   id?: number;
   file: {
@@ -25,4 +28,15 @@ export type SavedFile = {
   name: string;
   type: string;
   url?: string;
+};
+
+//Props types
+export type SavedFilesProps = {
+  savedFiles: SavedFile[];
+};
+
+export type ButtonsProps = {
+  files: File[];
+  setErrors: Dispatch<SetStateAction<ErrorObject[]>>;
+  setFiles: Dispatch<SetStateAction<File[]>>;
 };

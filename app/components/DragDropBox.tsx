@@ -1,21 +1,21 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 
-import { AiFillFilePdf, AiFillFile } from "react-icons/ai";
-
-import { Alert, Fade, Snackbar } from "@mui/material";
+import { AiFillFile } from "react-icons/ai";
 
 import styles from "./DragDropBox.module.css";
-import Buttons from "./Buttons";
 
-import { ErrorObject } from "./../types";
+import { Button } from "@mui/material";
 
-import { retrieveFiles } from "../requests";
+import { ErrorObject, SavedFile } from "./../types";
+
+import { Context } from "../page";
+
+import { saveFiles } from "../requests";
 
 const DragDropBox = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
-  const [errors, setErrors] = useState<ErrorObject[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = (e: React.DragEvent<HTMLElement>) => {
@@ -56,23 +56,39 @@ const DragDropBox = () => {
     }
   };
 
-  const fetchFiles = async () => {
-    return await retrieveFiles();
+  const { setSavedFiles, setError, setShowError } = useContext(Context);
+
+  const handleSave = () => {
+    saveFiles(files).then((res: SavedFile[]) => {
+      const result = res.reduce(
+        (r, o) => {
+          return o.id !== null
+            ? { ...r, accepted: [...r.accepted, o] }
+            : { ...r, rejected: [...r.rejected, o] };
+        },
+        { accepted: [], rejected: [] } as {
+          accepted: SavedFile[];
+          rejected: SavedFile[];
+        }
+      );
+
+      if (result.rejected.length > 0) {
+        setError([...result.rejected]);
+        setShowError(true);
+        setTimeout(() => {
+          setError([]);
+        }, 3200);
+
+        setTimeout(() => {
+          setShowError(false);
+        }, 3000);
+      }
+      if (result.accepted.length > 0) {
+        setSavedFiles((state: SavedFile[]) => [...state, ...result.accepted]);
+        setFiles([]);
+      }
+    });
   };
-
-  // useEffect(() => {
-  //   retrieveFiles().then((res) => {
-  //     const blob = new Blob([res.data], {
-  //       type: res.headers["Content-Type"]?.toString(),
-  //     });
-  //     const file = new File([blob], "test");
-  //     console.log(file);
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   console.log(files);
-  // }, [files]);
 
   return (
     <>
@@ -109,15 +125,24 @@ const DragDropBox = () => {
             draggable={true}
             onClick={(e) => e.preventDefault()}
           >
-            <p>Drag your file here</p>
-            <button
+            <p>Drag your files here or browse for them</p>
+            <Button
               className="upload-button"
               onClick={() => onButtonClick()}
+              variant="contained"
+              color="warning"
             >
               Upload a file
-            </button>
+            </Button>
           </div>
         </label>
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          color="success"
+        >
+          Save All Files
+        </Button>
         <div>
           {files.map((file, index) => {
             return (
@@ -131,10 +156,6 @@ const DragDropBox = () => {
             );
           })}
         </div>
-        <Buttons
-          files={files}
-          setErrors={setErrors}
-        />
       </form>
     </>
   );

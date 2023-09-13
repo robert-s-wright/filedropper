@@ -1,29 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-import { SavedFile } from "../types";
-import { retrieveFileNamesWExt, retrieveFile } from "../requests";
+import { SavedFile, SavedFilesProps } from "../types";
+import { retrieveFile } from "../requests";
 
 import { Stack, Typography, Button } from "@mui/material";
 
-export const SavedFiles = () => {
-  const [savedFiles, setSavedFiles] = useState<SavedFile[]>([]);
-
-  useEffect(() => {
-    retrieveFileNamesWExt().then((res) => setSavedFiles(res.data));
-  }, []);
-
+export const SavedFiles = ({ savedFiles }: SavedFilesProps) => {
   const handleDownload = async (fileId: number) => {
-    const url = await retrieveFile(fileId);
-    // setSavedFiles((state) => {
-    //   return state.map((file) => {
-    //     if (file.id === fileId) {
-    //       return { ...file, url };
-    //     } else {
-    //       return file;
-    //     }
-    //   });
-    // });
+    await retrieveFile(fileId);
   };
 
   return (
@@ -31,7 +16,12 @@ export const SavedFiles = () => {
       className="container"
       padding={2}
     >
-      <Typography variant="h5">Saved Files</Typography>
+      <Typography
+        variant="h5"
+        alignSelf="center"
+      >
+        Saved Files
+      </Typography>
       {savedFiles.map((file, ind) => {
         return (
           <Stack
@@ -41,17 +31,14 @@ export const SavedFiles = () => {
             alignItems="center"
           >
             <div>{file.name}</div>
-
-            <Button onClick={() => handleDownload(file.id)}>Retrieve</Button>
-            {file.url ? (
-              <a
-                href={file.url}
-                // download={file.name}
-                target="_blank"
-              >
-                Download!
-              </a>
-            ) : null}
+            <Button
+              variant="contained"
+              onClick={() => handleDownload(file.id)}
+              size="small"
+              color="success"
+            >
+              Retrieve
+            </Button>
           </Stack>
         );
       })}
